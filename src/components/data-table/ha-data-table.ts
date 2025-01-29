@@ -28,6 +28,7 @@ import "../search-input";
 import { filterData, sortData } from "./sort-filter";
 import type { LocalizeFunc } from "../../common/translations/localize";
 import { nextRender } from "../../common/util/render-status";
+import { replaceHA2MSH } from "../../common/util/replace-ha-2-msh";
 
 export interface RowClickedEvent {
   id: string;
@@ -643,10 +644,10 @@ export class HaDataTable extends LitElement {
                           )}
                       </div>
                       ${column.extraTemplate
-                        ? column.extraTemplate(row)
+                        ? replaceHA2MSH(column.extraTemplate(row))
                         : nothing}`
-                  : html`${row[key]}${column.extraTemplate
-                      ? column.extraTemplate(row)
+                  : html`${replaceHA2MSH(row[key])}${column.extraTemplate
+                      ? replaceHA2MSH(column.extraTemplate(row))
                       : nothing}`}
             </div>
           `;

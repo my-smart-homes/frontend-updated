@@ -97,6 +97,7 @@ import { configSections } from "../ha-panel-config";
 import "../integrations/ha-integration-overflow-menu";
 import { showAddIntegrationDialog } from "../integrations/show-add-integration-dialog";
 import { showLabelDetailDialog } from "../labels/show-dialog-label-detail";
+import { fetchDeviceCountLimit } from "../../../common/util/get-device-limit";
 
 interface DeviceRowData extends DeviceRegistryEntry {
   device?: DeviceRowData;
@@ -1058,7 +1059,7 @@ export class HaConfigDeviceDashboard extends SubscribeMixin(LitElement) {
     history.replaceState({ filter: this._filter }, "");
   }
 
-  private _addDevice() {
+  private async _addDevice() {
     const { filteredConfigEntry, filteredDomains } =
       this._devicesAndFilterDomains(
         this.hass.devices,
@@ -1070,6 +1071,25 @@ export class HaConfigDeviceDashboard extends SubscribeMixin(LitElement) {
         this.hass.localize,
         this._labels
       );
+
+    // Calculate total device count
+    const totalDeviceCount = Object.keys(this.hass.devices).length;
+    const limit = await fetchDeviceCountLimit(this.hass);
+    if (limit !== undefined) {
+      if (totalDeviceCount >= limit) {
+        showAlertDialog(this, {
+          title: "Sorry",
+          text: "Maximum devices reached. Remove one to add a new device.",
+        });
+        return;
+      }
+    } else {
+      showAlertDialog(this, {
+        title: "Sorry",
+        text: "Something went wrong with your subscription.",
+      });
+      return;
+    }
 
     if (
       filteredDomains.size === 1 &&

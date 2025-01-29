@@ -1,7 +1,6 @@
 import type { TemplateResult } from "lit";
 import { css, html, LitElement } from "lit";
-import { customElement, property } from "lit/decorators";
-import { isComponentLoaded } from "../../../common/config/is_component_loaded";
+import { customElement, property, state } from "lit/decorators";
 import "../../../layouts/hass-subpage";
 import "../../../components/ha-card";
 import "../../../components/ha-md-list";
@@ -12,6 +11,7 @@ import "./ha-config-network";
 import "./ha-config-url-form";
 import "./supervisor-hostname";
 import "./supervisor-network";
+import "../../../components/ha-circular-progress";
 
 const NETWORK_BROWSERS = ["dhcp", "ssdp", "zeroconf"] as const;
 
@@ -23,6 +23,40 @@ class HaConfigSectionNetwork extends LitElement {
 
   @property({ type: Boolean }) public narrow = false;
 
+  @state() private hassNotLoaded = true;
+
+  @state() private _isLoading = true;
+
+  @state() private _error = "Error";
+
+  @state() private remoteUrl = "";
+
+  protected updated(
+    changedProps: Map<string | number | symbol, unknown>
+  ): void {
+    super.updated(changedProps);
+    if (changedProps.has("hass") && this.hass && this.hassNotLoaded) {
+      this.hassNotLoaded = false;
+      this._onLoad();
+    }
+  }
+
+  private async _onLoad(): Promise<void> {
+    try {
+      this._isLoading = true;
+      const response = await this.hass.callWS<number>({
+        type: "config_entries/get_remote_external_url",
+      });
+
+      if (!response) throw new Error("No response from server");
+      if (!response.external_url) throw new Error("No external url found");
+      this.remoteUrl = response.external_url;
+    } catch (_) {
+      this._error = "Failed to load remote URL.";
+    }
+    this._isLoading = false;
+  }
+
   protected render(): TemplateResult {
     return html`
       <hass-subpage
@@ -32,48 +66,33 @@ class HaConfigSectionNetwork extends LitElement {
         .header=${this.hass.localize("ui.panel.config.network.caption")}
       >
         <div class="content">
-          ${isComponentLoaded(this.hass, "hassio")
-            ? html`<supervisor-hostname
-                  .hass=${this.hass}
-                  .narrow=${this.narrow}
-                ></supervisor-hostname>
-                <supervisor-network .hass=${this.hass}></supervisor-network>`
-            : ""}
-          <ha-config-url-form .hass=${this.hass}></ha-config-url-form>
-          <ha-config-network .hass=${this.hass}></ha-config-network>
-          ${NETWORK_BROWSERS.some((component) =>
-            isComponentLoaded(this.hass, component)
-          )
-            ? html`
-                <ha-card
-                  outlined
-                  class="discovery-card"
-                  header=${this.hass.localize(
-                    "ui.panel.config.network.discovery.title"
-                  )}
-                >
-                  <ha-md-list>
-                    ${NETWORK_BROWSERS.map(
-                      (domain) => html`
-                        <ha-md-list-item type="link" href="/config/${domain}">
-                          <div slot="headline">
-                            ${this.hass.localize(
-                              `ui.panel.config.network.discovery.${domain}`
-                            )}
-                          </div>
-                          <div slot="supporting-text">
-                            ${this.hass.localize(
-                              `ui.panel.config.network.discovery.${domain}_info`
-                            )}
-                          </div>
-                          <ha-icon-next slot="end"></ha-icon-next>
-                        </ha-md-list-item>
-                      `
-                    )}
-                  </ha-md-list>
-                </ha-card>
-              `
-            : ""}
+          <ha-card
+            class="no-padding"
+            outlined
+            .header=${this.hass.localize(
+              "ui.panel.config.network.supervisor.hostname.title"
+            )}
+          >
+            <div class="card-content">
+              ${this._isLoading
+                ? html`<ha-circular-progress indeterminate size="small">
+                  </ha-circular-progress>`
+                : html` <h3>Remote Url:</h3>
+                    <p>
+                      ${html`<a
+                        title="remote-url"
+                        target="_blank"
+                        href="https://${this.remoteUrl}"
+                        >${this.remoteUrl}</a
+                      >`}
+                    </p>`}
+            </div>
+            <div class="card-actions">
+              <mwc-button .disabled=${true}>
+                ${this.hass.localize("ui.common.save")}
+              </mwc-button>
+            </div>
+          </ha-card>
         </div>
       </hass-subpage>
     `;

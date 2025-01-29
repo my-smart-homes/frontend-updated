@@ -130,7 +130,7 @@ class HaConfigInfo extends LitElement {
               >
               </ha-logo-svg>
             </a>
-            <p>Home Assistant</p>
+            <p>MSH</p>
             <ul class="versions">
               <li>
                 <span class="version-label"

@@ -10,6 +10,7 @@ class HaTip extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   public render() {
+    return nothing;
     if (!this.hass) {
       return nothing;
     }

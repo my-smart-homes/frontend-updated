@@ -166,11 +166,12 @@ class HaConfigDashboard extends SubscribeMixin(LitElement) {
 
   private _pages = memoizeOne((cloudStatus, isCloudLoaded) => {
     const pages: PageNavigation[] = [];
+    isCloudLoaded = false;
     if (isCloudLoaded) {
       pages.push({
         component: "cloud",
         path: "/config/cloud",
-        name: "Home Assistant Cloud",
+        name: "MSH Cloud",
         info: cloudStatus,
         iconPath: mdiCloudLock,
         iconColor: "#3B808E",

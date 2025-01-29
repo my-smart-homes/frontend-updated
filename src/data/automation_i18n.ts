@@ -171,7 +171,7 @@ const describeLegacyTrigger = (
     );
   }
 
-  // Home Assistant Trigger
+  // MSH Trigger
   if (trigger.trigger === "homeassistant" && trigger.event) {
     return hass.localize(
       trigger.event === "start"

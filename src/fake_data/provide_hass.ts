@@ -180,7 +180,7 @@ export const provideHass = (
   const noop = () => undefined;
 
   const hassObj: MockHomeAssistant = {
-    // Home Assistant properties
+    // MSH properties
     auth: {
       data: {
         hassUrl: "",

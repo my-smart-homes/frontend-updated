@@ -143,9 +143,7 @@ export class ThreadConfigPanel extends SubscribeMixin(LitElement) {
               slot="fab"
               @click=${this._importExternalThreadCredentials}
               extended
-              .label=${this.hass.localize(
-                "ui.panel.config.thread.thread_network_send_credentials_ha"
-              )}
+              label="Send credentials to MSH"
               ><ha-svg-icon slot="icon" .path=${mdiCellphoneKey}></ha-svg-icon
             ></ha-fab>`
           : nothing}

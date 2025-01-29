@@ -23,7 +23,10 @@ jobs:
       contents: write # Required to upload release assets
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@v4.2.0
+
+      - name: Verify version
+        uses: my-smart-homes/actions/helpers/verify-version@master
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
@@ -42,10 +45,10 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Download Translations
-        run: ./script/translations_download
-        env:
-          LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
+      # - name: Download Translations
+      #   run: ./script/translations_download
+      #   env:
+      #     LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
       - name: Build and release package
         run: |
           python3 -m pip install twine build
@@ -71,72 +74,13 @@ jobs:
           # Sleep to give pypi time to populate the new version across mirrors
           sleep 240
           version=$(echo "${{ github.ref }}" | awk -F"/" '{print $NF}' )
-          echo "home-assistant-frontend==$version" > ./requirements.txt
+          echo "my-home-assistant-frontend==$version" > ./requirements.txt
 
-      # home-assistant/wheels doesn't support SHA pinning
-      - name: Build wheels
-        uses: home-assistant/wheels@2025.10.0
-        with:
-          abi: cp313
-          tag: musllinux_1_2
-          arch: amd64
-          wheels-key: ${{ secrets.WHEELS_KEY }}
-          requirements: "requirements.txt"
-
-  release-landing-page:
-    name: Release landing-page frontend
-    if: github.event.release.prerelease == false
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # Required to upload release assets
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - name: Setup Node
-        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
-        with:
-          node-version-file: ".nvmrc"
-          cache: yarn
-      - name: Install dependencies
-        run: yarn install
-      - name: Download Translations
-        run: ./script/translations_download
-        env:
-          LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
-      - name: Build landing-page
-        run: landing-page/script/build_landing_page
-      - name: Tar folder
-        run: tar -czf landing-page/home_assistant_frontend_landingpage-${{ github.event.release.tag_name }}.tar.gz -C landing-page/dist .
-      - name: Upload release asset
-        uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2.4.2
-        with:
-          files: landing-page/home_assistant_frontend_landingpage-${{ github.event.release.tag_name }}.tar.gz
-
-  release-supervisor:
-    name: Release supervisor frontend
-    if: github.event.release.prerelease == false
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # Required to upload release assets
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - name: Setup Node
-        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
-        with:
-          node-version-file: ".nvmrc"
-          cache: yarn
-      - name: Install dependencies
-        run: yarn install
-      - name: Download Translations
-        run: ./script/translations_download
-        env:
-          LOKALISE_TOKEN: ${{ secrets.LOKALISE_TOKEN }}
-      - name: Build supervisor
-        run: hassio/script/build_hassio
-      - name: Tar folder
-        run: tar -czf hassio/home_assistant_frontend_supervisor-${{ github.event.release.tag_name }}.tar.gz -C hassio/build .
-      - name: Upload release asset
-        uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2.4.2
-        with:
-          files: hassio/home_assistant_frontend_supervisor-${{ github.event.release.tag_name }}.tar.gz
+      # - name: Build wheels
+      #   uses: home-assistant/wheels@2024.07.1
+      #   with:
+      #     abi: cp312
+      #     tag: musllinux_1_2
+      #     arch: amd64
+      #     wheels-key: ${{ secrets.WHEELS_KEY }}
+      #     requirements: "requirements.txt"

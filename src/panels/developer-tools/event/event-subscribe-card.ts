@@ -26,6 +26,8 @@ class EventSubscribeCard extends LitElement {
 
   @state() private _error?: string;
 
+  @state() private _error?: string;
+
   private _eventCount = 0;
 
   public disconnectedCallback() {

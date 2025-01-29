@@ -276,10 +276,13 @@ class HaOnboarding extends litLocalizeLiteMixin(HassElement) {
   private async _fetchInstallationType(): Promise<void> {
     try {
       const response = await fetchInstallationType();
-      this._supervisor = [
-        "Home Assistant OS",
-        "Home Assistant Supervised",
-      ].includes(response.installation_type);
+      this._supervisor = ["MSH OS", "MSH Supervised"].includes(
+        response.installation_type
+      );
+      if (this._supervisor) {
+        // Only load if we have supervisor
+        import("./onboarding-restore-backup");
+      }
     } catch (err: any) {
       // eslint-disable-next-line no-console
       console.error(

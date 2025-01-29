@@ -52,11 +52,7 @@ export class HassioUpdate extends LitElement {
           🎉
         </h1>
         <div class="card-group">
-          ${this._renderUpdateCard(
-            "Home Assistant Core",
-            "core",
-            this.supervisor.core
-          )}
+          ${this._renderUpdateCard("MSH Core", "core", this.supervisor.core)}
           ${this._renderUpdateCard(
             "Supervisor",
             "supervisor",

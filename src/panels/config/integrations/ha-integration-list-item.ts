@@ -12,7 +12,7 @@ import { brandsUrl } from "../../../util/brands-url";
 import type { IntegrationListItem } from "./dialog-add-integration";
 import "../../../components/ha-svg-icon";
 import "../../../components/ha-icon-next";
-import "../../../components/ha-tooltip";
+import { replaceHA2MSH } from "../../../common/util/replace-ha-2-msh";
 
 @customElement("ha-integration-list-item")
 export class HaIntegrationListItem extends ListItemBase {
@@ -32,8 +32,8 @@ export class HaIntegrationListItem extends ListItemBase {
     if (!this.integration) {
       return nothing;
     }
-    return html`${this.integration.name ||
-    domainToName(this.hass.localize, this.integration.domain)}
+    return html`${replaceHA2MSH(this.integration.name) ||
+    replaceHA2MSH(domainToName(this.hass.localize, this.integration.domain))}
     ${this.integration.is_helper ? " (helper)" : ""}`;
   }
 
