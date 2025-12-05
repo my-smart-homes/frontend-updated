@@ -7823,7 +7823,7 @@
             "iframe": {
               "name": "Webpage",
               "hide_background": "Hide background",
-              "hide_background_helper": "Useful for pages which allow a transparent background."
+              "hide_background_helper": "Useful for pages which allow a transparent background.",
               "description": "The Webpage card allows you to embed your favorite webpage right into MSH."
             },
             "light": {
