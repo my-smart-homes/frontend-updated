@@ -11,9 +11,10 @@ import "./ha-config-network";
 import "./ha-config-url-form";
 import "./supervisor-hostname";
 import "./supervisor-network";
-import "../../../components/ha-circular-progress";
+import "../../../components/ha-spinner";
+import "../../../components/ha-button";
 
-const NETWORK_BROWSERS = ["dhcp", "ssdp", "zeroconf"] as const;
+const _NETWORK_BROWSERS = ["dhcp", "ssdp", "zeroconf"] as const;
 
 @customElement("ha-config-section-network")
 class HaConfigSectionNetwork extends LitElement {
@@ -75,8 +76,7 @@ class HaConfigSectionNetwork extends LitElement {
           >
             <div class="card-content">
               ${this._isLoading
-                ? html`<ha-circular-progress indeterminate size="small">
-                  </ha-circular-progress>`
+                ? html`<ha-spinner size="small"></ha-spinner>`
                 : html` <h3>Remote Url:</h3>
                     <p>
                       ${html`<a
@@ -88,9 +88,9 @@ class HaConfigSectionNetwork extends LitElement {
                     </p>`}
             </div>
             <div class="card-actions">
-              <mwc-button .disabled=${true}>
+              <ha-button .disabled=${true}>
                 ${this.hass.localize("ui.common.save")}
-              </mwc-button>
+              </ha-button>
             </div>
           </ha-card>
         </div>

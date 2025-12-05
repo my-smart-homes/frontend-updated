@@ -306,16 +306,65 @@ export class HaVoiceAssistantSetupStepPipeline extends LitElement {
           )
         ).agents.find((agnt) => agnt.id === "conversation.home_assistant");
 
-      let pipelineName = "MSH Cloud";
-      let i = 1;
-      while (
-        pipelines.pipelines.find(
-          // eslint-disable-next-line no-loop-func
-          (pipeline) => pipeline.name === pipelineName
-        )
-      ) {
-        pipelineName = `MSH Cloud ${i}`;
-        i++;
+        if (!agent?.supported_languages.length) {
+          return false;
+        }
+
+        const ttsEngine = (
+          await listTTSEngines(
+            this.hass,
+            this.language || this.hass.config.language,
+            this.hass.config.country || undefined
+          )
+        ).providers.find((provider) => provider.engine_id === cloudTtsEntityId);
+
+        if (!ttsEngine?.supported_languages?.length) {
+          return false;
+        }
+
+        const ttsVoices = await listTTSVoices(
+          this.hass,
+          cloudTtsEntityId,
+          ttsEngine.supported_languages[0]
+        );
+
+        const sttEngine = (
+          await listSTTEngines(
+            this.hass,
+            this.language || this.hass.config.language,
+            this.hass.config.country || undefined
+          )
+        ).providers.find((provider) => provider.engine_id === cloudSttEntityId);
+
+        if (!sttEngine?.supported_languages?.length) {
+          return false;
+        }
+
+        let pipelineName = "MSH Cloud";
+        let i = 1;
+        while (
+          pipelines.pipelines.find(
+            // eslint-disable-next-line no-loop-func
+            (pipeline) => pipeline.name === pipelineName
+          )
+        ) {
+          pipelineName = `MSH Cloud ${i}`;
+          i++;
+        }
+
+        cloudPipeline = await createAssistPipeline(this.hass, {
+          name: pipelineName,
+          language: (this.language || this.hass.config.language).split("-")[0],
+          conversation_engine: "conversation.home_assistant",
+          conversation_language: agent.supported_languages[0],
+          stt_engine: cloudSttEntityId,
+          stt_language: sttEngine.supported_languages[0],
+          tts_engine: cloudTtsEntityId,
+          tts_language: ttsEngine.supported_languages[0],
+          tts_voice: ttsVoices.voices![0].voice_id,
+          wake_word_entity: null,
+          wake_word_id: null,
+        });
       }
 
       await this.hass.callService(
