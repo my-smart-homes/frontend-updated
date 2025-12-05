@@ -12,6 +12,7 @@ import { brandsUrl } from "../../../util/brands-url";
 import type { IntegrationListItem } from "./dialog-add-integration";
 import "../../../components/ha-svg-icon";
 import "../../../components/ha-icon-next";
+import "../../../components/ha-tooltip";
 import { replaceHA2MSH } from "../../../common/util/replace-ha-2-msh";
 
 @customElement("ha-integration-list-item")

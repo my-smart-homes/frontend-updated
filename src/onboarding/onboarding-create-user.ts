@@ -7,6 +7,7 @@ import type { LocalizeFunc } from "../common/translations/localize";
 import { debounce } from "../common/util/debounce";
 import "../components/ha-button";
 import "../components/ha-form/ha-form";
+import "./onboarding-loading";
 import type { HaForm } from "../components/ha-form/ha-form";
 import type {
   HaFormDataContainer,
