@@ -283,15 +283,32 @@ export function fillDataGapsAndRoundCaps(datasets: BarSeriesOption[]) {
 }
 
 export function fillLineGaps(datasets: LineSeriesOption[]) {
+  // First, sort each dataset by timestamp
+  datasets.forEach((dataset) => {
+    if (dataset.data && dataset.data.length > 0) {
+      dataset.data = dataset.data.slice().sort((a, b) => {
+        const aVal = a && typeof a === "object" && "value" in a ? a.value?.[0] : a?.[0];
+        const bVal = b && typeof b === "object" && "value" in b ? b.value?.[0] : b?.[0];
+        return Number(aVal) - Number(bVal);
+      });
+    }
+  });
+
   const buckets = Array.from(
     new Set(
       datasets
         .map((dataset) =>
-          dataset.data!.map((datapoint) => Number(datapoint![0]))
+          dataset.data!.map((datapoint) => {
+            const item = datapoint && typeof datapoint === "object" && "value" in datapoint
+              ? datapoint.value?.[0]
+              : datapoint?.[0];
+            return Number(item);
+          })
         )
         .flat()
     )
   ).sort((a, b) => a - b);
+  
   buckets.forEach((bucket, index) => {
     for (let i = datasets.length - 1; i >= 0; i--) {
       const dataPoint = datasets[i].data![index];
