@@ -28,8 +28,6 @@ import type { HaCheckbox } from "../ha-checkbox";
 import "../ha-svg-icon";
 import "../search-input";
 import { filterData, sortData } from "./sort-filter";
-import type { LocalizeFunc } from "../../common/translations/localize";
-import { nextRender } from "../../common/util/render-status";
 import { replaceHA2MSH } from "../../common/util/replace-ha-2-msh";
 
 export interface RowClickedEvent {
